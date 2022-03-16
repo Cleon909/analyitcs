@@ -3,6 +3,7 @@ import datetime
 import json
 import os
 from urllib.parse import parse_qsl, urlparse
+from flask_sqlalchemy import SQLAlchemy
 
 from flask import Flask, Response, abort, request
 from peewee import *
@@ -23,13 +24,13 @@ JAVASCRIPT = """(function(){
 
 
 # Flask application settings.
-DEBUG = bool(os.environ.get('DEBUG'))
+DEBUG = True
 SECRET_KEY = 'sadfujhsdf'  # 
 
 app = Flask(__name__)
 app.config.from_object(__name__)
 
-database = SqliteDatabase(DATABASE_NAME, pragmas={
+database = 'mysql//root:todo@db'(DATABASE_NAME, pragmas={
     'journal_mode': 'wal',  # WAL-mode for better concurrent access.
     'cache_size': -32000})  # 32MB page cache.
 
