@@ -1,12 +1,9 @@
 from base64 import b64decode
 import datetime
 import json
-import os
 from urllib.parse import parse_qsl, urlparse
-from flask_sqlalchemy import SQLAlchemy
-import pymysql
-
 from flask import Flask, Response, abort, request
+import pymysql
 from peewee import *
 
 # 1 pixel GIF, base64-encoded.
@@ -21,7 +18,7 @@ JAVASCRIPT = """(function(){
 
 # create database
 con = pymysql.connect(host='db', user='root', password='todo')
-con.cursor().execute('CREATE DATABASE analytics')
+con.cursor().execute('CREATE DATABASE IF NOT EXISTS analytics')
 con.close() 
 
 # Flask application settings.
@@ -44,6 +41,7 @@ class JSONField(TextField):
             return json.dumps(value)
 
 class PageView(Model):
+    id = AutoField()
     domain = CharField()
     url = TextField()
     timestamp = DateTimeField(default=datetime.datetime.now, index=True)
