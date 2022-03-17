@@ -4,17 +4,13 @@ import json
 import os
 from urllib.parse import parse_qsl, urlparse
 from flask_sqlalchemy import SQLAlchemy
+import pymysql
 
 from flask import Flask, Response, abort, request
 from peewee import *
 
 # 1 pixel GIF, base64-encoded.
 BEACON = b64decode('R0lGODlhAQABAIAAANvf7wAAACH5BAEAAAAALAAAAAABAAEAAAICRAEAOw==')
-
-# Store the database file in the app directory.
-APP_DIR = os.path.dirname(__file__)
-DATABASE_NAME = os.path.join(APP_DIR, 'analytics.db')
-DOMAIN = 'http://127.0.0.1:5000' 
 
 # Simple JavaScript which will be included and executed on the client-side.
 JAVASCRIPT = """(function(){
@@ -23,6 +19,11 @@ JAVASCRIPT = """(function(){
     })()""".replace('\n', '')
 
 
+# create database
+con = pymysql.connect(host='db', user='root', password='todo')
+con.cursor().execute('CREATE DATABASE analytics')
+con.close() 
+
 # Flask application settings.
 DEBUG = True
 SECRET_KEY = 'sadfujhsdf'  # 
@@ -30,9 +31,7 @@ SECRET_KEY = 'sadfujhsdf'  #
 app = Flask(__name__)
 app.config.from_object(__name__)
 
-database = 'mysql//root:todo@db'(DATABASE_NAME, pragmas={
-    'journal_mode': 'wal',  # WAL-mode for better concurrent access.
-    'cache_size': -32000})  # 32MB page cache.
+db = MySQLDatabase('analytics',host='db', user='root', password='todo')
 
 class JSONField(TextField):
     """Store JSON data in a TextField."""
@@ -69,14 +68,15 @@ class PageView(Model):
             params=params)
 
     class Meta:
-        database = database
+        database = db
+
 
 @app.route('/a.gif')
 def analyze():
     if not request.args.get('url'):
         abort(404)
 
-    with database.transaction():
+    with db.transaction():
         PageView.create_from_request()
 
     response = Response(app.config['BEACON'], mimetype='image/gif')
@@ -94,5 +94,6 @@ def not_found(e):
     return Response('Not found.')
 
 if __name__ == '__main__':
-    database.create_tables([PageView], safe=True)
+    db.connect()
+    db.create_tables([PageView], safe=True)
     app.run()
