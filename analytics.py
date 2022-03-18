@@ -8,7 +8,7 @@ from peewee import *
 
 # 1 pixel GIF, base64-encoded.
 BEACON = b64decode('R0lGODlhAQABAIAAANvf7wAAACH5BAEAAAAALAAAAAABAAEAAAICRAEAOw==')
-DOMAIN = 'analytics:5000'
+DOMAIN = 'http://192.168.0.16:5001'
 # Simple JavaScript which will be included and executed on the client-side.
 JAVASCRIPT = """(function(){
     var d=document,i=new Image,e=encodeURIComponent;
@@ -42,18 +42,14 @@ class JSONField(TextField):
 
 class PageView(Model):
     id = AutoField()
-    name = TextField()
-
-# class PageView(Model):
-#     id = AutoField()
-#     domain = CharField()
-#     url = TextField()
-#     timestamp = DateTimeField(default=datetime.datetime.now, index=True)
-#     title = TextField(default='')
-#     ip = CharField(default='')
-#     referrer = TextField(default='')
-#     headers = JSONField()
-#     params = JSONField()
+    domain = CharField()
+    url = TextField()
+    timestamp = DateTimeField(default=datetime.datetime.now, index=True)
+    title = TextField(default='')
+    ip = CharField(default='')
+    referrer = TextField(default='')
+    headers = JSONField()
+    params = JSONField()
 
     @classmethod
     def create_from_request(cls):
@@ -87,7 +83,7 @@ def analyze():
 
 @app.route('/a.js')
 def script():
-     return Response(
+    return Response(
         app.config['JAVASCRIPT'] % (app.config['DOMAIN']),
         mimetype='text/javascript')
 
@@ -98,4 +94,4 @@ def not_found(e):
 if __name__ == '__main__':
     db.connect()
     db.create_tables([PageView], safe=True)
-    app.run()
+    app.run(host='0.0.0.0', port=5001)
