@@ -8,7 +8,7 @@ from peewee import *
 
 # 1 pixel GIF, base64-encoded.
 BEACON = b64decode('R0lGODlhAQABAIAAANvf7wAAACH5BAEAAAAALAAAAAABAAEAAAICRAEAOw==')
-DOMAIN = '0.0.0.0:5000'
+DOMAIN = 'analytics:5000'
 # Simple JavaScript which will be included and executed on the client-side.
 JAVASCRIPT = """(function(){
     var d=document,i=new Image,e=encodeURIComponent;
@@ -42,14 +42,18 @@ class JSONField(TextField):
 
 class PageView(Model):
     id = AutoField()
-    domain = CharField()
-    url = TextField()
-    timestamp = DateTimeField(default=datetime.datetime.now, index=True)
-    title = TextField(default='')
-    ip = CharField(default='')
-    referrer = TextField(default='')
-    headers = JSONField()
-    params = JSONField()
+    name = TextField()
+
+# class PageView(Model):
+#     id = AutoField()
+#     domain = CharField()
+#     url = TextField()
+#     timestamp = DateTimeField(default=datetime.datetime.now, index=True)
+#     title = TextField(default='')
+#     ip = CharField(default='')
+#     referrer = TextField(default='')
+#     headers = JSONField()
+#     params = JSONField()
 
     @classmethod
     def create_from_request(cls):
