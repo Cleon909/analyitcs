@@ -8,7 +8,7 @@ from peewee import *
 
 # 1 pixel GIF, base64-encoded.
 BEACON = b64decode('R0lGODlhAQABAIAAANvf7wAAACH5BAEAAAAALAAAAAABAAEAAAICRAEAOw==')
-
+DOMAIN = '0.0.0.0:5000'
 # Simple JavaScript which will be included and executed on the client-side.
 JAVASCRIPT = """(function(){
     var d=document,i=new Image,e=encodeURIComponent;
